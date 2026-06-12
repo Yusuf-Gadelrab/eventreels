@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EventReels — your night, already edited</title>
+<meta name="description" content="Drop in raw event footage. Get back a finished highlight reel. No editing, no timeline, no skill needed.">
+<style>
+:root {
+  --black:#0a0908; --panel:#131210; --gold:#d4af37; --gold-hi:#f3d878; --gold-dim:#8c742a;
+  --text:#f2ede2; --dim:#9c937e;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body { background:var(--black); color:var(--text); overflow-x:hidden;
+  font:17px/1.6 -apple-system, "SF Pro Display", system-ui, sans-serif; }
+
+body::before, body::after {
+  content:""; position:fixed; border-radius:50%; filter:blur(130px); z-index:0;
+  pointer-events:none; opacity:.15;
+}
+body::before { width:60vw; height:60vw; background:var(--gold); top:-28vw; right:-18vw;
+  animation:drift 20s ease-in-out infinite alternate; }
+body::after { width:45vw; height:45vw; background:#b8860b; bottom:-26vw; left:-16vw;
+  animation:drift 26s ease-in-out infinite alternate-reverse; }
+@keyframes drift { to { transform:translate(5vw,4vh) scale(1.18); } }
+
+.wrap { position:relative; z-index:1; max-width:880px; margin:0 auto; padding:0 24px; }
+
+/* hero */
+.hero { min-height:92vh; display:flex; flex-direction:column; justify-content:center;
+  text-align:center; }
+.logo { font-size:clamp(40px,7vw,72px); font-weight:800; letter-spacing:-.03em;
+  animation:rise .8s ease both; }
+.logo em { font-style:normal;
+  background:linear-gradient(100deg,var(--gold-dim),var(--gold) 35%,var(--gold-hi) 50%,var(--gold) 65%,var(--gold-dim));
+  background-size:200% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
+  animation:shine 4s linear infinite; }
+@keyframes shine { to { background-position:200% center; } }
+.hero p.sub { font-size:clamp(18px,2.6vw,23px); color:var(--dim); margin-top:14px;
+  animation:rise .8s .15s ease both; }
+.hero p.sub b { color:var(--gold); font-weight:600; }
+@keyframes rise { from { opacity:0; transform:translateY(22px); } }
+
+/* waitlist form */
+.cta { margin-top:42px; animation:rise .8s .3s ease both; }
+.row { display:flex; gap:10px; max-width:520px; margin:0 auto; }
+.row input {
+  flex:1; padding:16px 18px; font-size:16px; border-radius:14px; color:var(--text);
+  background:rgba(19,18,16,.85); border:1px solid #3a342a; transition:border-color .2s;
+}
+.row input:focus { outline:none; border-color:var(--gold); }
+.row button {
+  padding:16px 26px; font-size:16px; font-weight:800; border:0; border-radius:14px;
+  background:linear-gradient(120deg,var(--gold),var(--gold-hi)); color:#171307; cursor:pointer;
+  box-shadow:0 10px 34px rgba(212,175,55,.35); transition:transform .15s, box-shadow .2s;
+  white-space:nowrap; position:relative; overflow:hidden;
+}
+.row button::after { content:""; position:absolute; inset:0;
+  transform:translateX(-110%) skewX(-18deg);
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.4),transparent);
+  transition:transform .55s ease; }
+.row button:hover::after { transform:translateX(110%) skewX(-18deg); }
+.row button:hover { transform:translateY(-2px); box-shadow:0 16px 44px rgba(212,175,55,.5); }
+#msg { margin-top:14px; font-size:14px; color:var(--gold); min-height:20px; }
+#msg.pop { animation:msgpop .5s cubic-bezier(.2,.9,.3,1.4); }
+@keyframes msgpop { from { opacity:0; transform:scale(.85); } }
+.count { margin-top:8px; font-size:13px; color:var(--dim); }
+
+.scroll-hint { margin-top:60px; color:var(--dim); font-size:13px; letter-spacing:.15em;
+  text-transform:uppercase; animation:bob 2.4s ease-in-out infinite; }
+@keyframes bob { 50% { transform:translateY(6px); } }
+
+/* how it works */
+section { padding:90px 0; }
+h2 { font-size:clamp(26px,4vw,36px); text-align:center; margin-bottom:14px; }
+h2 em { font-style:normal; color:var(--gold); }
+.lead { text-align:center; color:var(--dim); max-width:560px; margin:0 auto 50px; }
+.steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; }
+.step {
+  background:linear-gradient(180deg,#181613,var(--panel)); border:1px solid #2a2620;
+  border-radius:18px; padding:26px 20px; text-align:center;
+  transition:border-color .3s, box-shadow .3s;
+}
+.step:hover { border-color:var(--gold-dim); box-shadow:0 12px 36px rgba(212,175,55,.12); }
+.step:hover .n { transform:scale(1.12) rotate(-6deg); }
+.step .n { transition:transform .3s cubic-bezier(.2,.9,.3,1.4); }
+/* generic scroll-reveal (steps, headings, strip) */
+.sr { opacity:0; transform:translateY(26px); transition:opacity .6s, transform .6s; }
+.sr.show { opacity:1; transform:none; }
+.step .n { width:42px; height:42px; margin:0 auto 14px; border-radius:50%; display:grid;
+  place-items:center; font-size:20px; background:rgba(212,175,55,.1);
+  border:1px solid var(--gold-dim); }
+.step h3 { font-size:17px; margin-bottom:6px; }
+.step p { font-size:14px; color:var(--dim); }
+
+/* social proof strip */
+.strip { text-align:center; border-top:1px solid #221f1a; border-bottom:1px solid #221f1a;
+  padding:34px 0; }
+.strip .big { font-size:clamp(20px,3vw,26px); font-weight:700; }
+.strip .big em { font-style:normal; color:var(--gold); }
+.strip .dim { color:var(--dim); margin-top:6px; font-size:15px; }
+
+footer { text-align:center; padding:44px 0 60px; color:#5d564a; font-size:13px; }
+footer a { color:var(--gold-dim); }
+@media (prefers-reduced-motion:reduce) {
+  *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important;
+    transition-duration:.01ms !important; }
+  .sr { opacity:1; transform:none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="logo">Event<em>Reels</em></div>
+    <p class="sub">Drop in raw footage from your event.<br>
+      Get back a <b>finished highlight reel</b>. No editing. No timeline. No skill.</p>
+
+    <div class="cta">
+      <form id="wl" class="row">
+        <input id="email" type="email" required placeholder="you@school.edu">
+        <button type="submit">Join the waitlist ✦</button>
+      </form>
+      <div id="msg"></div>
+      <div class="count">For clubs, frats, and event hosts who film everything and edit nothing.</div>
+    </div>
+
+    <div class="scroll-hint">↓ how it works</div>
+  </div>
+
+  <section>
+    <h2 class="sr">An editor that <em>watches and listens</em></h2>
+    <p class="lead sr">The same footage you'd let rot in your camera roll, cut like someone
+      who knows what they're doing stayed up all night doing it.</p>
+    <div class="steps">
+      <div class="step sr"><div class="n">👁️</div><h3>Watch</h3>
+        <p>Scene detection finds the visual moments worth keeping.</p></div>
+      <div class="step sr"><div class="n">🎧</div><h3>Listen</h3>
+        <p>Loudness analysis finds the crowd energy and the drops.</p></div>
+      <div class="step sr"><div class="n">⚡</div><h3>Pick</h3>
+        <p>The best seconds, in story order. Nothing boring survives.</p></div>
+      <div class="step sr"><div class="n">🎬</div><h3>Cut</h3>
+        <p>Vertical 9:16, clean fades, loudness-matched for IG and TikTok.</p></div>
+    </div>
+  </section>
+
+  <div class="strip sr">
+    <div class="big">Footage in. <em>Reel out.</em> Minutes, not weekends.</div>
+    <div class="dim">Your footage is processed and deleted. Never trained on. Never shared.</div>
+  </div>
+
+  <footer>
+    EventReels · built in public by <a href="https://github.com/Yusuf-Gadelrab">Yusuf Gadelrab</a> · San José, CA
+  </footer>
+</div>
+
+<script>
+// Waitlist: set FORM_ENDPOINT to a Formspree/Buttondown endpoint before a static launch.
+// When served by the studio app (/landing), it auto-uses the local /api/waitlist endpoint.
+// Otherwise it runs in demo mode (stores locally so nothing is lost while testing).
+const FORM_ENDPOINT = location.pathname.startsWith('/landing') ? '/api/waitlist' : "";
+
+document.getElementById('wl').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value.trim();
+  const msg = document.getElementById('msg');
+  if (FORM_ENDPOINT) {
+    try {
+      const r = await fetch(FORM_ENDPOINT, { method:'POST',
+        headers:{'Content-Type':'application/json'}, body:JSON.stringify({ email }) });
+      if (!r.ok) throw 0;
+    } catch { msg.textContent = '⚠ something broke, try again'; return; }
+  } else {
+    const list = JSON.parse(localStorage.wl || '[]');
+    if (!list.includes(email)) list.push(email);
+    localStorage.wl = JSON.stringify(list);
+  }
+  msg.textContent = "🥂 you're on the list. first reels go out to early signups.";
+  msg.classList.remove('pop'); void msg.offsetWidth; msg.classList.add('pop');
+  e.target.reset();
+});
+
+// scroll-reveal for headings, steps, and the proof strip
+const obs = new IntersectionObserver(es => es.forEach(en => {
+  if (en.isIntersecting) { en.target.classList.add('show'); obs.unobserve(en.target); }
+}), { threshold:.2 });
+document.querySelectorAll('.sr').forEach(el => obs.observe(el));
+document.querySelectorAll('.step').forEach((s, i) => {
+  s.style.transitionDelay = (i * .12) + 's';
+});
+</script>
+</body>
+</html>

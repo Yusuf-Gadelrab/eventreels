@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Watch Reel</title>
+<style>
+body { background:black; color:gold; font:15px/1.5 monospace; display:flex; justify-content:center; align-items:center; height:100vh; }
+.wrap { text-align:center; }
+video { max-width:100%; max-height:80vh; border:2px solid gold; border-radius:12px; }
+h1 { margin-top:16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <video id="v" controls preload="metadata"></video>
+  <h1 id="title"></h1>
+  <div class="dim">made with EventReels</div>
+</div>
+<script>
+const jid = location.pathname.split('/').pop();
+fetch(`/api/jobs/${jid}/video`) // wait, I need to expose this video endpoint again
+.then(r => r.blob()).then(b => {
+    $('v').src = URL.createObjectURL(b);
+});
+</script>
+</body>
+</html>

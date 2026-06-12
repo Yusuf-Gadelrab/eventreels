@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EventReels — your night, already edited</title>
+<style>
+:root {
+  --black:#0a0908; --panel:#121110; --panel2:#181613;
+  --gold:#d4af37; --gold-hi:#f3d878; --gold-dim:#8c742a;
+  --text:#f2ede2; --dim:#9c937e;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+html,body { height:100%; }
+body {
+  background:var(--black); color:var(--text); overflow-x:hidden;
+  font:16px/1.5 -apple-system, "SF Pro Display", system-ui, sans-serif;
+}
+
+/* ambient gold glow drifting behind everything */
+body::before, body::after {
+  content:""; position:fixed; border-radius:50%; filter:blur(120px); z-index:0;
+  pointer-events:none; opacity:.16;
+}
+body::before { width:60vw; height:60vw; background:var(--gold);
+  top:-30vw; right:-20vw; animation:drift 18s ease-in-out infinite alternate; }
+body::after { width:40vw; height:40vw; background:#b8860b;
+  bottom:-25vw; left:-15vw; animation:drift 24s ease-in-out infinite alternate-reverse; }
+@keyframes drift { to { transform:translate(6vw,4vh) scale(1.15); } }
+
+.wrap { position:relative; z-index:1; max-width:1060px; margin:0 auto; padding:48px 24px 80px; }
+
+header { text-align:center; margin-bottom:44px; animation:rise .7s ease both; }
+.logo { font-size:42px; font-weight:800; letter-spacing:-.02em; }
+.logo em {
+  font-style:normal;
+  background:linear-gradient(100deg,var(--gold-dim) 0%,var(--gold) 35%,var(--gold-hi) 50%,var(--gold) 65%,var(--gold-dim) 100%);
+  background-size:200% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
+  animation:shine 4s linear infinite;
+}
+@keyframes shine { to { background-position:200% center; } }
+.tag { color:var(--dim); margin-top:6px; font-size:17px; }
+.tag b { color:var(--gold); font-weight:600; }
+
+.stage-card {
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  border:1px solid #2a2620; border-radius:20px; padding:36px;
+  box-shadow:0 30px 80px rgba(0,0,0,.55), inset 0 1px 0 rgba(243,216,120,.07);
+  animation:rise .7s .12s ease both;
+}
+@keyframes rise { from { opacity:0; transform:translateY(18px); } }
+
+/* ---- upload ---- */
+#drop {
+  border:2px dashed #3a342a; border-radius:16px; padding:64px 24px; text-align:center;
+  cursor:pointer; transition:border-color .25s, background .25s, transform .15s, box-shadow .3s;
+  animation:rise .6s .25s ease both;
+}
+#drop.over { box-shadow:0 0 0 4px rgba(212,175,55,.15), 0 0 50px rgba(212,175,55,.2) inset; }
+.controls .field { animation:rise .6s ease both; }
+.controls .field:nth-child(1) { animation-delay:.4s; }
+.controls .field:nth-child(2) { animation-delay:.5s; }
+#drop:hover, #drop.over {
+  border-color:var(--gold); background:rgba(212,175,55,.05); transform:scale(1.005);
+}
+#drop .icon { font-size:46px; display:block; margin-bottom:14px;
+  animation:bob 2.6s ease-in-out infinite; }
+@keyframes bob { 50% { transform:translateY(-7px); } }
+#drop h2 { font-size:22px; font-weight:700; }
+#drop p { color:var(--dim); margin-top:6px; font-size:14px; }
+#drop p b { color:var(--gold); }
+
+.controls { display:flex; gap:22px; margin-top:26px; flex-wrap:wrap; align-items:end; }
+.field { flex:1; min-width:220px; }
+.field label { display:block; font-size:12px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--dim); margin-bottom:8px; }
+.field input[type=text] {
+  width:100%; background:#0d0c0a; border:1px solid #2e2a22; color:var(--text);
+  border-radius:10px; padding:12px 14px; font-size:15px; transition:border-color .2s;
+}
+.field input[type=text]:focus { outline:none; border-color:var(--gold); }
+.field input[type=file] {
+  width:100%; color:var(--dim); background:#0d0c0a; border:1px solid #2e2a22;
+  border-radius:10px; padding:10px 12px; font-size:14px;
+}
+.field input[type=file]::file-selector-button {
+  border:0; border-radius:8px; padding:8px 12px; margin-right:10px;
+  background:#211d15; color:var(--gold); font-weight:700; cursor:pointer;
+}
+.toggle {
+  min-height:44px; display:flex; align-items:center; gap:12px; cursor:pointer;
+  color:var(--text); background:#0d0c0a; border:1px solid #2e2a22;
+  border-radius:10px; padding:10px 12px;
+}
+.toggle input { position:absolute; opacity:0; pointer-events:none; }
+.toggle .switch {
+  width:42px; height:24px; border-radius:999px; background:#2e2a22;
+  position:relative; transition:background .2s, box-shadow .2s; flex:0 0 auto;
+}
+.toggle .switch::after {
+  content:""; position:absolute; width:18px; height:18px; border-radius:50%;
+  left:3px; top:3px; background:var(--dim); transition:transform .2s, background .2s;
+}
+.toggle input:checked + .switch {
+  background:var(--gold); box-shadow:0 0 18px rgba(212,175,55,.35);
+}
+.toggle input:checked + .switch::after { transform:translateX(18px); background:#171307; }
+.toggle b { font-size:14px; }
+input[type=range] { width:100%; appearance:none; height:6px; border-radius:3px;
+  background:linear-gradient(90deg,var(--gold) var(--p,40%), #2e2a22 var(--p,40%)); }
+input[type=range]::-webkit-slider-thumb { appearance:none; width:20px; height:20px;
+  border-radius:50%; background:linear-gradient(120deg,var(--gold),var(--gold-hi));
+  box-shadow:0 0 14px rgba(212,175,55,.6); cursor:pointer;
+  transition:transform .15s, box-shadow .2s; }
+input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2);
+  box-shadow:0 0 22px rgba(212,175,55,.85); }
+.durval { color:var(--gold); font-weight:700; }
+.segmented { display:flex; background:#0d0c0a; border:1px solid #2e2a22; border-radius:10px; overflow:hidden; }
+.segmented label { flex:1; position:relative; cursor:pointer; }
+.segmented label span { display:block; text-align:center; padding:10px 0; font-size:13px; font-weight:600; color:var(--dim); transition:background .2s, color .2s; border-right:1px solid #2e2a22; }
+.segmented label:last-child span { border-right:none; }
+.segmented input { position:absolute; opacity:0; pointer-events:none; }
+.segmented input:checked + span { background:linear-gradient(120deg,var(--gold),var(--gold-hi)); color:#171307; border-right-color:transparent; }
+
+/* ---- progress ---- */
+#progress { display:none; text-align:center; padding:30px 8px; }
+.stages { display:flex; justify-content:center; gap:0; margin:34px 0 26px; }
+.step { display:flex; align-items:center; }
+.dot {
+  width:46px; height:46px; border-radius:50%; display:grid; place-items:center;
+  background:#0d0c0a; border:2px solid #34302a; font-size:19px;
+  transition:border-color .4s, box-shadow .4s, background .4s;
+}
+.step .lbl { font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim);
+  margin-top:10px; transition:color .4s; }
+.step .col { display:flex; flex-direction:column; align-items:center; width:96px; }
+.bar-link { width:54px; height:2px; background:#34302a; margin-bottom:26px; position:relative;
+  overflow:hidden; }
+.bar-link::after { content:""; position:absolute; inset:0; background:var(--gold);
+  transform:scaleX(0); transform-origin:left; transition:transform .6s; }
+.step.active .dot {
+  border-color:var(--gold); background:rgba(212,175,55,.1);
+  box-shadow:0 0 22px rgba(212,175,55,.45); animation:pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse { 50% { box-shadow:0 0 36px rgba(212,175,55,.75); } }
+.step.done .dot { border-color:var(--gold); background:var(--gold); color:#0a0908; }
+.step.done + .step .bar-link::after, .step.done .bar-link::after { transform:scaleX(1); }
+.step.active .lbl, .step.done .lbl { color:var(--gold); }
+
+.meter { height:6px; border-radius:3px; background:#0d0c0a; overflow:hidden; max-width:420px;
+  margin:0 auto; }
+.meter > div {
+  height:100%; width:0%;
+  background:linear-gradient(90deg,var(--gold-dim),var(--gold),var(--gold-hi),var(--gold));
+  background-size:200% auto; animation:shine 1.8s linear infinite; transition:width .8s ease;
+}
+#stagetext { margin-top:16px; color:var(--dim); font-size:14px; min-height:20px; }
+#stagetext.swap { animation:textswap .4s ease; }
+@keyframes textswap { from { opacity:0; transform:translateY(6px); } }
+
+/* ---- result ---- */
+#result { display:none; }
+.reveal { animation:reveal .8s cubic-bezier(.2,.9,.3,1.2) both; }
+@keyframes reveal { from { opacity:0; transform:scale(.92) translateY(20px); } }
+.result-grid { display:grid; grid-template-columns:auto 1fr; gap:40px; align-items:center; }
+@media (max-width:760px){ .result-grid { grid-template-columns:1fr; justify-items:center; } }
+.phone {
+  width:264px; aspect-ratio:9/16; border-radius:28px; padding:9px; background:#000;
+  border:1px solid #3a342a; box-shadow:0 24px 70px rgba(0,0,0,.7), 0 0 50px rgba(212,175,55,.14);
+  animation:hover-float 5s 1s ease-in-out infinite;
+}
+@keyframes hover-float {
+  50% { transform:translateY(-9px);
+        box-shadow:0 34px 80px rgba(0,0,0,.65), 0 0 64px rgba(212,175,55,.22); }
+}
+.phone video { width:100%; height:100%; border-radius:20px; object-fit:cover; background:#000; }
+.result-info h2 { font-size:30px; margin-bottom:6px; }
+.result-info h2 em { font-style:normal; color:var(--gold); }
+.result-info .meta { color:var(--dim); margin-bottom:18px; }
+.moments { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:26px; }
+.chip {
+  border:1px solid #3a342a; border-radius:999px; padding:5px 13px; font-size:13px;
+  color:var(--dim); animation:rise .5s ease both;
+}
+.chip b { color:var(--gold); font-weight:600; }
+.btnrow { display:flex; gap:14px; flex-wrap:wrap; }
+.btn {
+  border:0; border-radius:12px; padding:14px 26px; font-size:15px; font-weight:700;
+  cursor:pointer; transition:transform .15s, box-shadow .2s; text-decoration:none;
+  display:inline-block; position:relative; overflow:hidden;
+}
+.btn::after { content:""; position:absolute; inset:0; transform:translateX(-110%) skewX(-18deg);
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);
+  transition:transform .55s ease; }
+.btn:hover::after { transform:translateX(110%) skewX(-18deg); }
+.btn:hover { transform:translateY(-2px); }
+.btn-gold {
+  background:linear-gradient(120deg,var(--gold),var(--gold-hi)); color:#171307;
+  box-shadow:0 10px 30px rgba(212,175,55,.35);
+}
+.btn-gold:hover { box-shadow:0 14px 38px rgba(212,175,55,.5); }
+.btn-ghost { background:transparent; color:var(--gold); border:1px solid var(--gold-dim); }
+#error { display:none; margin-top:18px; color:#ff8a7a; text-align:center;
+  animation:shake .45s ease; }
+@keyframes shake { 20%,60% { transform:translateX(-6px); } 40%,80% { transform:translateX(6px); } }
+footer { text-align:center; color:#5d564a; font-size:12px; margin-top:34px; }
+@media (prefers-reduced-motion:reduce) {
+  *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important;
+    transition-duration:.01ms !important; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">Event<em>Reels</em></div>
+    <div class="tag">drop your night in. get the <b>reel</b> out. zero editing.</div>
+  </header>
+
+  <div class="stage-card">
+    <!-- UPLOAD -->
+    <div id="upload">
+      <div id="drop">
+        <span class="icon">🎞️</span>
+        <h2>Drop your footage</h2>
+        <p>or <b>click to browse</b> — drop up to 12 clips from the same night · mp4 · mov · mkv · webm (2 GB total, stays on this machine)</p>
+        <input id="file" type="file" accept="video/*" multiple hidden>
+      </div>
+      
+      <h2>Library</h2>
+      <div id="library" class="grid" style="grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 26px;">
+        <div class="dim">loading library…</div>
+      </div>
+
+      <div class="controls">
+        <div class="field">
+          <label>Reel length — <span class="durval" id="durval">30s</span></label>
+          <input id="dur" type="range" min="10" max="60" step="5" value="30">
+        </div>
+        <div class="field">
+          <label>Title card (optional)</label>
+          <input id="title" type="text" maxlength="40" placeholder="RUSH WEEK ’26">
+        </div>
+        <div class="field">
+          <label>Music bed (optional) — mp3/m4a/wav</label>
+          <input id="music" type="file" accept=".mp3,.m4a,.wav,audio/*">
+        </div>
+        <div class="field">
+          <label>Template (Pacing & Style)</label>
+          <div class="segmented">
+            <label><input type="radio" name="template" value="auto" checked><span>Auto</span></label>
+            <label><input type="radio" name="template" value="rush"><span>Rush</span></label>
+            <label><input type="radio" name="template" value="gameday"><span>Game</span></label>
+            <label><input type="radio" name="template" value="formal"><span>Formal</span></label>
+            <label><input type="radio" name="template" value="hackathon"><span>Hack</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Account Tier</label>
+          <div class="segmented" style="border-color:#d4af37">
+            <label><input type="radio" name="tier" value="free" checked><span>Free</span></label>
+            <label><input type="radio" name="tier" value="pro"><span style="color:#171307; background:linear-gradient(120deg,#d4af37,#f3d878)">Pro ★</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Burn captions</label>
+          <label class="toggle">
+            <input id="captions" type="checkbox">
+            <span class="switch"></span>
+            <b>Burn captions</b>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div id="progress">
+      <div class="stages">
+        <div class="step" data-s="analyzing"><div class="col"><div class="dot">👁️</div><div class="lbl">Watch</div></div></div>
+        <div class="step" data-s="listening"><div class="bar-link"></div><div class="col"><div class="dot">🎧</div><div class="lbl">Listen</div></div></div>
+        <div class="step" data-s="scoring"><div class="bar-link"></div><div class="col"><div class="dot">⚡</div><div class="lbl">Pick</div></div></div>
+        <div class="step" data-s="rendering"><div class="bar-link"></div><div class="col"><div class="dot">🎬</div><div class="lbl">Cut</div></div></div>
+      </div>
+      <div class="meter"><div id="pbar"></div></div>
+      <div id="stagetext">uploading…</div>
+    </div>
+
+    <!-- RESULT -->
+    <div id="result">
+      <div class="result-grid reveal">
+        <div class="phone"><video id="player" controls playsinline loop></video></div>
+        <div class="result-info">
+          <h2>Your reel is <em>ready</em>.</h2>
+          <div class="meta" id="meta"></div>
+          <div class="moments" id="moments"></div>
+          <div class="btnrow">
+            <a class="btn btn-gold" id="download" download="eventreels.mp4">Download reel ↓</a>
+            <button class="btn btn-ghost" onclick="resetUI()">Cut another</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="error"></div>
+  </div>
+
+  <footer>runs 100% locally · your footage never leaves this machine · EventReels studio (alpha)</footer>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const drop = $('drop'), fileIn = $('file'), musicIn = $('music');
+const STAGE_INDEX = { analyzing:0, listening:1, scoring:2, captioning:2, rendering:3, done:4 };
+let poller = null;
+
+$('dur').oninput = e => {
+  $('durval').textContent = e.target.value + 's';
+  const r = e.target;
+  r.style.setProperty('--p', (100 * (r.value - r.min) / (r.max - r.min)) + '%');
+};
+$('dur').dispatchEvent(new Event('input'));
+drop.onclick = () => fileIn.click();
+['dragover','dragenter'].forEach(ev => drop.addEventListener(ev, e => {
+  e.preventDefault(); drop.classList.add('over'); }));
+['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => {
+  e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => { if (e.dataTransfer.files.length) start([...e.dataTransfer.files]); });
+fileIn.onchange = () => { if (fileIn.files.length) start([...fileIn.files]); };
+
+function show(section) {
+  ['upload','progress','result'].forEach(s => $(s).style.display = s === section ? 'block' : 'none');
+  $('error').style.display = 'none';
+}
+async function loadLibrary() {
+  try {
+    const reels = await api('/api/reels');
+    const lib = $('library');
+    if (!reels.length) { lib.innerHTML = '<div class="dim">your reels will appear here</div>'; return; }
+    lib.innerHTML = reels.map(r => `
+      <div class="card" style="padding:4px; cursor:pointer" onclick="location.href='/r/${r.id}'">
+        <video src="/api/jobs/${r.id}/video" preload="metadata" style="width:100%; border-radius:8px"></video>
+        <div style="font-size:12px; padding:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${r.title || 'untitled'}</div>
+      </div>
+    `).join('');
+  } catch (e) { console.error('Library load failed', e); }
+}
+
+async function start(files) {
+  const label = files.length === 1 ? files[0].name : files.length + ' clips';
+  show('progress'); setStage('uploaded', 5, 'uploading ' + label + '…');
+  const fd = new FormData();
+  files.forEach(f => fd.append('files', f));
+  fd.append('duration', $('dur').value);
+  fd.append('title', $('title').value);
+  fd.append('captions', $('captions').checked ? 'true' : 'false');
+  const tplNode = document.querySelector('input[name="template"]:checked');
+  if (tplNode) fd.append('template', tplNode.value);
+  const tierNode = document.querySelector('input[name="tier"]:checked');
+  if (tierNode) fd.append('pro', tierNode.value === 'pro' ? 'true' : 'false');
+  if (musicIn.files.length) fd.append('music', musicIn.files[0]);
+  try {
+    const r = await fetch('/api/jobs', { method:'POST', body: fd });
+    if (!r.ok) throw new Error((await r.json()).detail);
+    const { id } = await r.json();
+    poller = setInterval(() => { poll(id); loadLibrary(); }, 900); // refresh lib while polling
+  } catch (e) { fail(e.message); }
+}
+
+async function poll(id) {
+  try {
+    const j = await (await fetch('/api/jobs/' + id)).json();
+    if (j.status === 'error') { clearInterval(poller); return fail(j.error); }
+    setStage(j.stage, j.pct, ({analyzing:'watching for visual moments…',
+      listening:'listening for crowd energy…', scoring:'picking the best seconds…',
+      captioning:'captioning…',
+      rendering:'cutting your vertical reel…'})[j.stage] || j.stage);
+    if (j.status === 'done') { clearInterval(poller); finish(id, j); }
+  } catch { /* transient */ }
+}
+
+function setStage(stage, pct, text) {
+  $('pbar').style.width = pct + '%';
+  const st = $('stagetext');
+  if (st.textContent !== text) {
+    st.textContent = text;
+    st.classList.remove('swap'); void st.offsetWidth; st.classList.add('swap');
+  }
+  const idx = STAGE_INDEX[stage] ?? -1;
+  document.querySelectorAll('.step').forEach((el, i) => {
+    el.classList.toggle('done', i < idx || stage === 'done');
+    el.classList.toggle('active', i === idx);
+  });
+}
+
+function finish(id, j) {
+  show('result');
+  $('player').src = '/api/jobs/' + id + '/video';
+  $('download').href = '/api/jobs/' + id + '/video';
+  const fromClips = j.clips > 1 ? `${j.clips} clips · ` : '';
+  $('meta').textContent =
+    `${j.reel_duration}s reel · ${fromClips}cut from ${Math.round(j.source_duration)}s of footage · ${j.moments.length} moments`;
+  $('moments').innerHTML = j.moments.map((m, i) =>
+    `<span class="chip" style="animation-delay:${.08*i}s">${j.clips > 1 ? 'c'+m.clip+' · ' : ''}<b>${fmt(m.start)}</b> · ${Math.round((m.end-m.start)*10)/10}s</span>`).join('');
+  $('player').play().catch(()=>{});
+}
+
+const fmt = s => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+function fail(msg) { show('upload'); const e = $('error');
+  e.textContent = '⚠ ' + msg; e.style.display = 'block'; }
+function resetUI() { fileIn.value = ''; musicIn.value = ''; show('upload'); }
+show('upload');
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.db
+*.mp4
+!*/tests/fixture.mp4
+.pytest_cache/
+.DS_Store
+waitlist.json
