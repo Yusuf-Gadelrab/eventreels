@@ -1,7 +1,10 @@
 # EventReels 🎞️
 
-**Your night, already edited.** Drop in raw event footage, get back a finished 9:16 highlight
-reel. No timeline, no editor, no skill needed.
+EventReels is a local video-automation pipeline that turns raw event footage into a finished 9:16
+highlight reel, using ffmpeg scene-change detection and audio-energy analysis to pick and order the
+best moments. No timeline, no editor, no API keys.
+
+**Your night, already edited.**
 
 ## How it works
 The pipeline watches and listens to your footage, then cuts the reel the way an editor would:
