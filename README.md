@@ -45,3 +45,14 @@ window and renders a valid vertical reel.
 - **Thumbnail Library:** Studio UI now features a library strip for quick access to your history.
 - **Improved templates:** Rush, Game, Formal, and Hackathon templates added.
 - **Captioning:** Automatic transcription and caption burning.
+
+---
+
+## About the author
+
+Built by **Yusuf Gadelrab** — computer science student at San José State University (BS Computer Science, expected May 2028), AI/ML builder, and co-author of two peer-reviewed SIGCSE Technical Symposium 2026 papers on computer science education ([DOI 10.1145/3770761.3777339](https://doi.org/10.1145/3770761.3777339)).
+
+- Portfolio: <https://yusuf-gadelrab.github.io/>
+- About / FAQ: <https://yusuf-gadelrab.github.io/about.html>
+- Guides: <https://yusuf-gadelrab.github.io/guides.html>
+- Contact: yusuf.gadelrab06@gmail.com
